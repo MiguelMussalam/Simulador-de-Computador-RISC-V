@@ -1,0 +1,119 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Reflection.Emit;
+using System.Text;
+
+namespace Simulador_de_Computador_RISC_V
+{
+    public class CPU
+    {
+        public uint PC { get; set; }
+        public uint[] Registradores { get; set; }
+        public CPU()
+        {
+            PC = 0;
+            Registradores = new uint[32];
+        }
+        public void IniciarInstrucoes(Memoria memoria)
+        {
+            uint instrucao = memoria.memoria[PC / 4];
+            Console.WriteLine($"Instrução lida: 0x{instrucao:X8} no endereço PC: 0x{PC:X8}");
+            DecodificarInstrucao(instrucao);
+            iterar_pc();
+        }
+
+        private void DecodificarInstrucao(uint instrucao)
+        {
+            byte opcode = (byte)(instrucao & 0b01111111);
+            Console.WriteLine($"Opcode da instrução: 0x{opcode:X2}");
+            ULA(opcode, instrucao);
+        }
+
+        private void ULA(byte opcode, uint instrucao)
+        {
+            switch (opcode)
+            {
+                case 0b0001111:
+                    {
+                        byte funct3 = (byte)((instrucao >> 12) & 0b00000111);
+                        // FENCE
+                        if (funct3 == 000) break; //??
+
+                        else if (funct3 == 001) break; //??
+                        break;
+                    }
+                case 0b0010011:
+                    {
+                        byte funct3 = (byte)((instrucao >> 12) & 0b00000111);
+                        byte funct7 = (byte)((instrucao >> 25) & 0b01111111);
+
+                        // SLLI
+                        if (funct3 == 0b001 && funct7 == 0b0000000)
+                        {
+                            if(((instrucao >> 7) & 0b11111) == 0b0) { 
+                                Console.WriteLine("Registrador[0] é imutável.");
+                                break;
+                            }
+                            // x[rd] = x[rs1] << shamt
+                            Registradores[(instrucao >> 7) & 0b11111] = 
+                                (uint)(Registradores[(instrucao >> 15) & 0b11111] << (int)((instrucao >> 20) & 0b11111));
+                        }
+                        // SRLI
+                        else if (funct3 == 0b101 && funct7 == 0b0000000)
+                        {
+                            if (((instrucao >> 7) & 0b11111) == 0b0)
+                            {
+                                Console.WriteLine("Registrador[0] é imutável.");
+                                break;
+                            }
+
+                            //Registradores[(instrucao >> 15) & 0b11111] = 25;
+                            //Console.WriteLine($"Valor antes da SRLI: {Registradores[(instrucao >> 15) & 0b11111]}");
+
+                            // x[rd] = x[rs1] >>u shamt
+                            Registradores[(instrucao >> 7) & 0b11111] =
+                                (uint)(Registradores[(instrucao >> 15) & 0b11111] >> (int)((instrucao >> 20) & 0b11111));
+
+                            //Console.WriteLine($"Valor depois da SRLI: {Registradores[(instrucao >> 7) & 0b11111]}");
+                        }
+                        // SRAI
+                        else if(funct3 == 0b101 && funct7 == 0b0100000)
+                        {
+                            if (((instrucao >> 7) & 0b11111) == 0b0)
+                            {
+                                Console.WriteLine("Registrador[0] é imutável.");
+                                break;
+                            }
+
+                            // x[rd] = x[rs1] >>s shamt
+                            Registradores[(instrucao >> 7) & 0b11111] =
+                                (uint)((int)Registradores[(instrucao >> 15) & 0b11111] >> (int)((instrucao >> 20) & 0b11111));
+                        }
+                        // XORI
+                        else if(funct3 == 0b100)
+                        {
+                            if (((instrucao >> 7) & 0b11111) == 0b0)
+                            {
+                                Console.WriteLine("Registrador[0] é imutável.");
+                                break;
+                            }
+
+                            // x[rd] = x[rs1] ^ imm
+                            Registradores[(instrucao >> 7) & 0b11111] =
+                                (uint)(Registradores[(instrucao >> 15) & 0b11111] ^
+                                (((int)instrucao) >> 20));
+                        }
+                            break;
+                    }
+                default: break;
+            }
+            return;
+        }
+
+        private void iterar_pc()
+        {
+            PC += 4;
+        }
+
+    }
+}
