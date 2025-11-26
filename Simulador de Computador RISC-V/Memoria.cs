@@ -171,14 +171,11 @@ namespace Simulador_de_Computador_RISC_V
                 return 0;
             }
         }
-
-        // Método para obter o endereço atual (útil para saber onde a próxima instrução será colocada)
         public int ObterEnderecoAtual()
         {
             return enderecoAtual;
         }
 
-        // Método para limpar a memória (mantém a alocação, apenas zera)
         public void Limpar()
         {
             for (int i = 0; i < memoria.Length; i++)

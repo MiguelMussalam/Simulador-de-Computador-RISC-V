@@ -46,6 +46,11 @@ namespace Simulador_de_Computador_RISC_V.CPU
                 { (0b1100011, 0b101), ULA.BGE },
                 { (0b1100011, 0b110), ULA.BLTU },
                 { (0b1100011, 0b111), ULA.BGEU },
+
+                //S
+                { (0b0100011, 0b000), ULA.SB },
+                { (0b0100011, 0b001), ULA.SH },
+                { (0b0100011, 0b010), ULA.SW },
             };
 
         private static readonly Dictionary<byte, Action<CPU, uint>> TableOpcode =

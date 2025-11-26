@@ -14,7 +14,7 @@ internal class Program
         CPU cpu = new();
         cpu.InicializarRandomicamenteRegistradores();
 
-        for (int i = 0; i < 10; i++)
+        for (int i = 0; i < 30; i++)
         {
             Console.WriteLine($"PC: {cpu.PC:X8}");
             Decodificador.Executar(cpu, memoria.memoria[cpu.PC / 4]);

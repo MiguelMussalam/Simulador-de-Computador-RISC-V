@@ -387,7 +387,7 @@ namespace Simulador_de_Computador_RISC_V.CPU
             cpu.Registradores[(instr >> 7) & 0b11111] =
                 (uint)(((int)cpu.Registradores[(instr >> 15) & 0b11111] < (int)cpu.Registradores[(instr >> 20) & 0b11111]) ? 1 : 0);
 
-            Console.WriteLine("Operação: rs1({(uint)cpu.Registradores[(instr >> 15) & 0b11111]}) < rs2({(uint)cpu.Registradores[(instr >> 20) & 0b11111]})");
+            Console.WriteLine($"Operação: rs1({(uint)cpu.Registradores[(instr >> 15) & 0b11111]}) < rs2({(uint)cpu.Registradores[(instr >> 20) & 0b11111]})");
             Console.WriteLine($"rd depois da operação: {cpu.Registradores[(instr >> 7) & 0b11111]}\n\n");
         }
 
@@ -553,6 +553,27 @@ namespace Simulador_de_Computador_RISC_V.CPU
 
             Console.WriteLine($"Operação: rs1({(uint)cpu.Registradores[(instr >> 15) & 0b11111]}) >= rs2({(uint)cpu.Registradores[(instr >> 20) & 0b11111]})");
             Console.WriteLine($"PC depois da operação: {cpu.PC}\n\n");
+        }
+
+
+        public static void SB(CPU cpu, uint instr)
+        {
+            Console.WriteLine("Operação SB\n");
+            Console.WriteLine($"Memória antes da operação: 'ula vai pedir pro barramento a info - futuro'");
+        }
+
+
+        public static void SH(CPU cpu, uint instr)
+        {
+            Console.WriteLine("Operação SH\n");
+            Console.WriteLine($"Memória antes da operação: 'ula vai pedir pro barramento a info - futuro'");
+        }
+
+
+        public static void SW(CPU cpu, uint instr)
+        {
+            Console.WriteLine("Operação SW\n");
+            Console.WriteLine($"Memória antes da operação: 'ula vai pedir pro barramento a info - futuro'");
         }
     }
 }
