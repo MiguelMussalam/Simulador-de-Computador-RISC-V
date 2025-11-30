@@ -78,7 +78,7 @@ namespace Simulador_de_Computador_RISC_V.CPU
             byte funct3 = (byte)((instr >> 12) & 0x7);
 
             // Instruções B - apenas opcode + funct3
-            if (opcode == 0b1100011)
+            if (opcode == 0b0010011 || opcode == 0b1100011 || opcode == 0b0100011)
             {
                 var key = (opcode, funct3);
                 if (TableSemFunct7.TryGetValue(key, out var exec))

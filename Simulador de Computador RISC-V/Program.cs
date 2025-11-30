@@ -10,15 +10,19 @@ internal class Program
 {
     static void Main()
     {
-        Memoria memoria = new(3);
-        CPU cpu = new();
-        cpu.InicializarRandomicamenteRegistradores();
+        Barramento barramento = new();
+        Memoria Memoria = new(1, barramento);
+        CPU cpu = new(barramento);
+
+        barramento.ReferenciarModulos(cpu, Memoria);
+
+
+        //cpu.InicializarRegistradoresZerados();
 
         for (int i = 0; i < 30; i++)
         {
             Console.WriteLine($"PC: {cpu.PC:X8}");
-            Decodificador.Executar(cpu, memoria.memoria[cpu.PC / 4]);
-            cpu.iterar_pc();
+            Decodificador.Executar(cpu,barramento.LerDadoMemoria(cpu.PC));
         }
     }
 }

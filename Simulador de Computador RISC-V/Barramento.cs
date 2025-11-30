@@ -4,17 +4,24 @@ using System.Text;
 
 namespace Simulador_de_Computador_RISC_V
 {
-    internal class Barramento
+    public class Barramento
     {
-        public uint LerMemoria(uint endereco, Memoria memoria)
+        CPU.CPU Cpu { get; set; }
+        Memoria Memoria { get; set; }
+
+        public void ReferenciarModulos(CPU.CPU Cpu, Memoria Memoria)
         {
-            return memoria.memoria[endereco / 4];
+            this.Cpu = Cpu;
+            this.Memoria = Memoria;
+        }
+        public uint LerDadoMemoria(uint endereco)
+        {
+            return Memoria.Ram[endereco / 4];
         }
 
-        public uint EscreverMemoria(uint endereco, uint valor, Memoria memoria)
+        public void EnviarDadoMemoria(uint endereco, uint valor, Memoria.TamanhoAcesso tamanhoAcesso)
         {
-            memoria.memoria[endereco / 4] = valor;
-            return valor;
+            Memoria.Escrever(endereco, valor, tamanhoAcesso);
         }
     }
 }
