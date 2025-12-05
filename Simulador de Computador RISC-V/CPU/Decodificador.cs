@@ -51,6 +51,9 @@ namespace Simulador_de_Computador_RISC_V.CPU
                 { (0b0100011, 0b000), ULA.SB },
                 { (0b0100011, 0b001), ULA.SH },
                 { (0b0100011, 0b010), ULA.SW },
+
+                // L
+                { (0b0000011, 0b100), ULA.LBU }
             };
 
         private static readonly Dictionary<byte, Action<CPU, uint>> TableOpcode =
@@ -59,6 +62,9 @@ namespace Simulador_de_Computador_RISC_V.CPU
                 // U
                 { 0b0110111, ULA.LUI },
                 { 0b0010111, ULA.AUIPC },
+
+                // UJ
+                { 0b1101111, ULA.JAL }
             };
         public static void Executar(CPU cpu, uint instr)
         {
@@ -78,7 +84,7 @@ namespace Simulador_de_Computador_RISC_V.CPU
             byte funct3 = (byte)((instr >> 12) & 0x7);
 
             // Instruções B - apenas opcode + funct3
-            if (opcode == 0b0010011 || opcode == 0b1100011 || opcode == 0b0100011)
+            if (opcode == 0b0010011 || opcode == 0b1100011 || opcode == 0b0100011 || opcode == 0b0000011)
             {
                 var key = (opcode, funct3);
                 if (TableSemFunct7.TryGetValue(key, out var exec))
@@ -109,7 +115,14 @@ namespace Simulador_de_Computador_RISC_V.CPU
                 }
             }
 
-            Console.WriteLine($"Instrução não implementada.");
+            throw new NotImplementedException(
+                $"Instrução não implementada ou inválida: " +
+                $"opcode=0b{Convert.ToString(opcode, 2).PadLeft(7, '0')}, " +
+                $"funct3=0b{Convert.ToString(funct3, 2).PadLeft(3, '0')}, " +
+                $"funct7=0b{Convert.ToString(funct7, 2).PadLeft(7, '0')} " +
+                $"(HEX: instr=0x{instr:X8})"
+            );
+
         }
     }
 }

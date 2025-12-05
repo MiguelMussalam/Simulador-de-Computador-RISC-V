@@ -13,15 +13,11 @@ namespace Simulador_de_Computador_RISC_V
         private const uint VRAM_COMECO = 0x80000;
         private const uint VRAM_FIM = 0x8FFFF;
 
-        private const uint ENTRADA_SAIDA_COMECO = 0x9FC00;
-        private const uint ENTRADA_SAIDA_FIM = 0x9FFFF;
-        private const uint CONSOLE_ADDR = 0x9FC00;
-
         public enum TamanhoAcesso { Byte, Half, Word }
 
         public uint[] Ram;
         public uint[] Vram;
-        public uint[] EntradaSaidaProg;
+        public uint[] ExpansaoFutura;
         private int enderecoAtual;
         public Barramento barramento;
 
@@ -31,18 +27,9 @@ namespace Simulador_de_Computador_RISC_V
 
             Ram = new uint[131072]; // 131.072 palavras de 32 bits      512KB
             Vram = new uint[16384]; // 16.384 palavras de 32 bits       64KB
-            EntradaSaidaProg = new uint[256]; // 256 palavras de 32     bits 1KB
+            ExpansaoFutura = new uint[256]; // 256 palavras de 32     bits 1KB
 
             enderecoAtual = 0;
-
-            //Console.WriteLine("Memoria");
-            // Zera toda a memória
-            //for (int i = 0; i < Ram.Length; i++)
-            //{
-            //    Ram[i] = 0;
-            //    Console.WriteLine($"[{i}]: {Ram[i]}");
-            //    //if (i % 2 == 0 && i != 0) Console.WriteLine($"Memória[{i - 1}] inicializada com valor: {Ram[i - 1]} ; Memória[{i}] inicializada com valor: {Ram[i]}");
-            //}
 
             // Adiciona instruções conforme o tipo de teste
             switch (tipo_teste)
@@ -69,23 +56,19 @@ namespace Simulador_de_Computador_RISC_V
         {
             // Instruções para imprimir todos os caracteres ASCII de 0 a 127
             uint[] instrucoes = {
-        // --- Setup ---
-        /* 0x00 */ 0x00000093, // addi x1, x0, 0          ; x1 = 0 (será nosso caractere a ser impresso)
-        /* 0x04 */ 0x08000193, // addi x3, x0, 128        ; x3 = 128 (limite do loop)
+                0x02000093, // addi x1, x0, 32
+                0x07F00193, // addi x3, x0, 127
 
-        // --- A CORREÇÃO PRINCIPAL ESTÁ AQUI ---
-        // Antes: lui x4, 0xC0000 (apontava para um endereço inválido)
-        // Agora: apontamos para o endereço do console
-        /* 0x08 */ 0x0009F237, // lui  x4, 0x9F          ; x4 = 0x9F000 (endereço base para a área de E/S)
-        
-        // --- Loop (começa no PC=0x0C) ---
-        // A instrução 'sb' agora usa um offset para chegar ao endereço 0x9FC00
-        /* 0x0C */ 0x00120E23, // sb   x1, 192(x4)       ; Mem[0x9F000 + 192 (0xC0)] = x1. Escreve no CONSOLE_ADDR.
-        /* 0x10 */ 0x00108093, // addi x1, x1, 1          ; x1++ (próximo caractere)
-        /* 0x14 */ 0xFE309CE3, // bne  x1, x3, -8        ; Se x1 != 128, pule 2 instruções para trás (para a instrução 'sb')
-        
-        // --- Fim ---
-        /* 0x18 */ 0x0000006F  // jal x0, 0 (loop infinito para terminar o programa)
+                0x000802B7, // LUI x5, 0x00080   → x5 = 0x00080000 (VRAM)
+
+                0x00000013, // NOP (pode deixar vazio)
+
+                0x00128023, // sb   x1, 0(x5)
+                0x00108093, // addi x1, x1, 1
+                0x00428293, // addi x5, x5, 4
+                0xFE3094E3, // bne  x1, x3, -12
+                0x0000006F  // jal  x0, 0
+
             };
 
             AdicionarArrayInstrucoes(instrucoes);
@@ -95,26 +78,25 @@ namespace Simulador_de_Computador_RISC_V
         {
             // Instruções para imprimir "Hello"
             uint[] instrucoes = {
-                // --- Setup ---
-                /* 0x00 */ 0x0001C1B7, // lui   a3, 0x1C        ; a3 = 0x1C000 (endereço aproximado dos dados)
-                /* 0x04 */ 0xFE818193, // addi  a3, a3, -24     ; a3 = 0x1C000 - 24 = 0x1BFE8. Ajuste para apontar para "Hello!" (explicação abaixo)
-                /* 0x08 */ 0x0009F2B7, // lui   a5, 0x9F        ; a5 = 0x9F000 (endereço base do console)
-                /* 0x0C */ 0xC0028293, // addi  a5, a5, 192     ; a5 = 0x9F000 + 192 = 0x9FC00 (endereço exato do console)
+                // Setup
+                0x00000197, // auipc x3, 0          ; x3 = 0x0
+                0x02418193, // addi  x3, x3, 36     ; x3 = 0x24 (endereço dos dados)
+                /* 0x08 */ 0x000802B7, // lui   x5, 0x80       ; x5 = 0x80000 (ponteiro de escrita VRAM)
         
-                // --- Loop (começa no PC=0x10) ---
-                /* 0x10 */ 0x0006C603, // lbu   a2, 0(a3)       ; Carrega um byte do endereço da string em a2
-                /* 0x14 */ 0x00000C63, // beqz  a2, 12          ; Se o byte for 0 (fim da string), pula para o fim do programa (+12 bytes)
-                /* 0x18 */ 0x00C28023, // sb    a2, 0(a5)       ; Escreve o byte (caractere) no console
-                /* 0x1C */ 0x00168693, // addi  a3, a3, 1       ; Avança o ponteiro da string
-                /* 0x20 */ 0xFF1FF06F, // jal   zero, -16       ; Pula de volta para o início do loop (para o 'lbu')
+                // Loop
+                0x0001A303, // lb    x6, 0(x3)      ; x6 = Mem[x3] (caractere)
+                0x00030663, // beq   x6, x0, 12      ; Se x6 == 0, pula para o fim
+                0x00628023, // sb    x6, 0(x5)      ; VRAM[x5] = x6
+                0x00118193, // addi  x3, x3, 1       ; Avança ponteiro da string
+                0x00128293, // addi  x5, x5, 1       ; Avança ponteiro da VRAM
+                0xFE0FF0E3, // jal   x0, -20         ; Volta para o 'lb'
+        
+                // Fim
+                0x0000006F, // jal x0, 0
 
-                // --- Dados (a string em si) ---
-                // O assembler normalmente alinha isso, mas vamos colocar manualmente aqui.
-                // O endereço final de 'jal' é 0x20. As instruções ocupam até 0x24.
-                // O PC para o dado seria 0x28, 0x2C, etc.
-                // Nosso ponteiro 'a3' foi ajustado para apontar para cá (endereço 0x28).
-                /* 0x24 */ 0x6C6C6548, // "lleH" (Hello!)
-                /* 0x28 */ 0x000A216F, // "o!\n\0" (invertido, com nova linha e terminador nulo)
+                // Dados
+                0x6C6C6548, // "lleH"
+                0x00216F6F  // "\0!o"
             };
 
             AdicionarArrayInstrucoes(instrucoes);
@@ -122,42 +104,83 @@ namespace Simulador_de_Computador_RISC_V
 
         private void AdicionarTesteOperacoesRV32I()
         {
-            // Instruções para teste de todas as operações RV32I
-            uint[] instrucoes = {
-                // Teste de instruções I
-                0x00429313, // slli x6, x5, 4
-                0x0042D313, // srli x6, x5, 4
-                0x4042D313, // srai x6, x5, 4
-                0x00A2C313, // xori x6, x5, 10
-                0x00A2E313, // ori x6, x5, 10
-                0x00A2F313, // andi x6, x5, 10
-                0x00A2A313, // slti x6, x5, 10
-                0x00A2B313, // sltiu x6, x5, 10
-                0x00A28313, // addi x6, x5, 10
-                
-                // Teste de instruções R
-                0x00629333, // sll x6, x5, x6
-                0x0062D333, // srl x6, x5, x6
-                0x4062D333, // sra x6, x5, x6
-                0x00628333, // add x6, x5, x6
-                0x40628333, // sub x6, x5, x6
-                0x0062C333, // xor x6, x5, x6
-                0x0062E333, // or x6, x5, x6
-                0x0062F333, // and x6, x5, x6
-                0x0062A333, // slt x6, x5, x6
-                0x0062B333, // sltu x6, x5, x6
-                
-                // Teste de instruções U
-                0x00001337, // lui x6, 1
-                0x00002337, // auipc x6, 2
-                
-                // Teste de instruções B
-                0x00528463, // beq x5, x5, 8
-                0x00529463, // bne x5, x5, 8
-                0x0052C463, // blt x5, x5, 8
-                0x0052D463, // bge x5, x5, 8
-                0x0052E463, // bltu x5, x5, 8
-                0x0052F463, // bgeu x5, x5, 8
+                    // Instruções para teste de todas as operações RV32I
+                    uint[] instrucoes = {
+                // ==========================================================
+                // Bloco 1: Setup e Teste de Imediatos (ADDI, XORI, ORI, ANDI)
+                // ==========================================================
+                0x00500293, // addi x5, x0, 5          ; x5 = 5
+                0xFFB00313, // addi x6, x0, -5         ; x6 = -5 (0xFFFFFFFB)
+                0x0F02C393, // xori x7, x5, 240        ; x7 = 5 ^ 240 = 245 (0xF5)
+                0x0F02E413, // ori  x8, x5, 240        ; x8 = 5 | 240 = 245 (0xF5)
+                0x0F02F493, // andi x9, x5, 240        ; x9 = 5 & 240 = 0   (0x00)
+
+                // ==========================================================
+                // Bloco 2: Teste de LUI e AUIPC
+                // ==========================================================
+                0x000F0537, // lui   x10, 0xF0         ; x10 = 0xF0000
+                0x00000597, // auipc x11, 0            ; x11 = PC atual = 0x18
+        
+                // ==========================================================
+                // Bloco 3: Teste de Armazenamento (SW, SH, SB)
+                // Vamos armazenar os resultados anteriores na memória.
+                // ==========================================================
+                0x00602023, // sw  x6, 0(x0)           ; Mem[0] = x6 (-5)
+                0x00702223, // sw  x7, 4(x0)           ; Mem[4] = x7 (245)
+                0x00802423, // sw  x8, 8(x0)           ; Mem[8] = x8 (245)
+                0x00902623, // sw  x9, 12(x0)          ; Mem[12] = x9 (0)
+                0x00A02823, // sw  x10, 16(x0)         ; Mem[16] = x10 (0xF0000)
+                0x00B02A23, // sw  x11, 20(x0)         ; Mem[20] = x11 (0x18)
+
+                // Teste de SH e SB
+                0x00501023, // sh x5, 24(x0)           ; Mem[24] = 0x0005 (halfword de x5)
+                0x00600223, // sb x6, 28(x0)           ; Mem[28] = 0xFB (byte de x6)
+        
+                // ==========================================================
+                // Bloco 4: Teste de Carga (LBU)
+                // ==========================================================
+                0x01C04603, // lbu x12, 28(x0)         ; x12 = Mem[28] = 0xFB (251)
+        
+                // ==========================================================
+                // Bloco 5: Teste de Shifts (SLLI, SRLI, SRAI)
+                // ==========================================================
+                0x002C1693, // slli x13, x24, 2        ; x24 (t4) tem 0, então x13=0
+                                                                // (Vamos assumir que você colocou valores antes de testar)
+                                                                // Vamos usar x6 que tem -5 (0xFFFFFFFB)
+                0x00231693, // slli x13, x6, 2         ; x13 = -5 << 2 = -20 (0xFFFFFFEC)
+                0x00235713, // srli x14, x6, 2         ; x14 = -5 >>l 2 = 0x3FFFFFFE
+                0x40235793, // srai x15, x6, 2         ; x15 = -5 >>a 2 = -2 (0xFFFFFFFE)
+
+                // ==========================================================
+                // Bloco 6: Teste de Operações R (ADD, SUB, SLT, SLTU)
+                // ==========================================================
+                // Vamos somar x5 (5) e x6 (-5). Resultado deve ser 0.
+                0x00628833, // add x16, x5, x6         ; x16 = 5 + (-5) = 0
+                // Vamos subtrair x6 (-5) de x5 (5). Resultado deve ser 10.
+                0x406288B3, // sub x17, x5, x6         ; x17 = 5 - (-5) = 10
+                // Comparar x6 (-5) < x5 (5)? (signed) Deve ser 1.
+                0x0062A933, // slt x18, x6, x5         ; x18 = (-5 < 5) ? 1 : 0 => 1
+                // Comparar x6 (-5) < x5 (5)? (unsigned) Deve ser 0.
+                0x0062B9B3, // sltu x19, x6, x5        ; x19 = (big_num < 5) ? 1 : 0 => 0
+        
+                // ==========================================================
+                // Bloco 7: Teste de Branches
+                // ==========================================================
+                // x16 (t1) é 0. beq x16, x0, 8 -> deve pular
+                0x00080463, // beq x16, x0, 8          ; Pula para 0x68
+                0xDEADBEEF, // addi x0, x0, 0          ; Instrução que deve ser pulada (NOP)
+                // x17 (t2) é 10. bne x17, x0, 8 -> deve pular
+                0x00089463, // bne x17, x0, 8          ; Pula para 0x70
+                0xDEADBEEF, // addi x0, x0, 0          ; Instrução que deve ser pulada (NOP)
+
+                // ==========================================================
+                // Bloco 8: Teste de JAL
+                // ==========================================================
+                0x0080006F, // jal x1, 8               ; Pula para 0x78. x1 = 0x74
+                0xDEADBEEF, // addi x0, x0, 0          ; Instrução que deve ser pulada (NOP)
+        
+                // Fim
+                0x0000006F  // jal x0, 0               ; Loop infinito para parar
             };
 
             AdicionarArrayInstrucoes(instrucoes);
@@ -260,25 +283,24 @@ namespace Simulador_de_Computador_RISC_V
             }
             else if (endereco >= VRAM_COMECO && endereco <= VRAM_FIM)
             {
-                Vram[(endereco - VRAM_COMECO) / 4] = dado;
-            }
-            else if (endereco == CONSOLE_ADDR)
-            {
-                Console.Write((char)(dado & 0xFF)); // Escrever uma word no console imprime o primeiro byte
+                uint indice = (endereco - VRAM_COMECO) / 4;
+
+                Vram[indice] = dado;
+
+                AtualizarVRAM_Interativo((char)(dado & 0xFF));
             }
             else
                 throw new Exception($"Falha de Escrita: Endereço 0x{endereco:X8} fora do mapa.");
         }
 
+
         private void EscreverHalfword(uint endereco, ushort dado)
         {
-            if (endereco % 2 != 0)
-                throw new Exception($"Falha de alinhamento: Escrita de Halfword em 0x{endereco:X8}");
-
             if (endereco >= RAM_COMECO && endereco <= RAM_FIM)
             {
+                // Escrita normal na RAM
                 uint indice_palavra = (endereco - RAM_COMECO) / 4;
-                uint offset_bytes = (endereco - RAM_COMECO) % 4; // Será 0 ou 2
+                uint offset_bytes = (endereco - RAM_COMECO) % 4;
 
                 uint palavra_atual = Ram[indice_palavra];
                 uint mascara = ~(0xFFFFu << (int)(offset_bytes * 8));
@@ -288,53 +310,73 @@ namespace Simulador_de_Computador_RISC_V
             }
             else if (endereco >= VRAM_COMECO && endereco <= VRAM_FIM)
             {
-                uint indice_palavra = (endereco - VRAM_COMECO) / 4;
-                uint offset_bytes = (endereco - VRAM_COMECO) % 4;
+                // ---- CORREÇÃO AQUI ----
+                if ((endereco - VRAM_COMECO) % 4 != 0)
+                    throw new Exception("VRAM só aceita escrita word-addressed.");
 
-                uint palavra_atual = Vram[indice_palavra];
-                uint mascara = ~(0xFFFFu << (int)(offset_bytes * 8));
-                uint dado_posicionado = (uint)dado << (int)(offset_bytes * 8);
+                uint indice = (endereco - VRAM_COMECO) / 4;
 
-                Vram[indice_palavra] = (palavra_atual & mascara) | dado_posicionado;
-            }
-            else if (endereco == CONSOLE_ADDR)
-            {
-                Console.Write((char)(dado & 0xFF)); // Trata como escrita de byte
+                // Salva o halfword como palavra inteira
+                Vram[indice] = (uint)dado;
+
+                AtualizarVRAM_Interativo((char)(dado & 0xFF));
             }
             else
                 throw new Exception($"Falha de Escrita: Endereço 0x{endereco:X8} fora do mapa.");
         }
+
 
         private void EscreverByte(uint endereco, byte dado)
         {
             if (endereco >= RAM_COMECO && endereco <= RAM_FIM)
             {
+                // Escrita normal na RAM (byte-addressed)
                 uint indice_palavra = (endereco - RAM_COMECO) / 4;
-                uint offset_bytes = (endereco - RAM_COMECO) % 4;
+                uint byte_offset = (endereco - RAM_COMECO) % 4;
 
                 uint palavra_atual = Ram[indice_palavra];
-                uint mascara = ~(0xFFu << (int)(offset_bytes * 8));
-                uint dado_posicionado = (uint)dado << (int)(offset_bytes * 8);
+                uint mascara = ~(0xFFu << (int)(byte_offset * 8));
+                uint dado_posicionado = (uint)dado << (int)(byte_offset * 8);
 
                 Ram[indice_palavra] = (palavra_atual & mascara) | dado_posicionado;
             }
             else if (endereco >= VRAM_COMECO && endereco <= VRAM_FIM)
             {
-                uint indice_palavra = (endereco - VRAM_COMECO) / 4;
-                uint offset_bytes = (endereco - VRAM_COMECO) % 4;
+                // ---- CORREÇÃO AQUI ----
+                if ((endereco - VRAM_COMECO) % 4 != 0)
+                    throw new Exception("VRAM só aceita endereços múltiplos de 4 (word-addressed).");
 
-                uint palavra_atual = Vram[indice_palavra];
-                uint mascara = ~(0xFFu << (int)(offset_bytes * 8));
-                uint dado_posicionado = (uint)dado << (int)(offset_bytes * 8);
+                uint indice = (endereco - VRAM_COMECO) / 4;
 
-                Vram[indice_palavra] = (palavra_atual & mascara) | dado_posicionado;
-            }
-            else if (endereco == CONSOLE_ADDR)
-            {
-                Console.Write((char)dado);
+                // Salva o dado inteiro no índice (ascii em 32 bits)
+                Vram[indice] = (uint)dado;
+
+                AtualizarVRAM_Interativo((char)dado);
             }
             else
-                throw new Exception($"Falha de Escrita: Endereço 0x{endereco:X8} fora do mapa.");
+            {
+                throw new Exception($"Falha de Escrita de Byte: Endereço 0x{endereco:X8} não mapeado.");
+            }
+        }
+
+        private void AtualizarVRAM_Interativo(char caractere)
+        {
+
+            for(int i = 0; i < Vram.Length; i++)
+            {
+                if (Vram[i] != 0)       
+                {
+
+                    Console.WriteLine($"Vram: 0x{Vram[i]:X8} ('{(char)(Vram[i] & 0xFF)}')");
+                }
+            }
+            // Ação 1: Mostrar apenas o único caractere sendo adicionado.
+            // Isso dá o feedback imediato da operação 'sb'.
+            //Console.Write(caractere);
+
+            // Ação 2: Esperar que o usuário pressione Enter para continuar a simulação.
+            Console.WriteLine("  <-- Pressione Enter para o próximo passo...");
+            Console.ReadLine();
         }
     }
 }

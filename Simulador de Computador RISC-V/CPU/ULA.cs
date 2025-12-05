@@ -10,22 +10,23 @@ namespace Simulador_de_Computador_RISC_V.CPU
     {
         public static void SLLI(CPU cpu, uint instr)
         {
+
+            Console.WriteLine("Operação SLLI\n");
             if (((instr >> 7) & 0b11111) == 0b0)
             {
                 Console.WriteLine("Registrador[0] é imutável.");
                 cpu.iterar_pc();
                 return;
             }
-
-            Console.WriteLine("Operação SLLI\n");
             Console.WriteLine($"rd antes da operação: 0x{cpu.Registradores[((instr >> 7) & 0b11111)]:X8}");
+
+            Console.WriteLine($"Operação: rs1(0x{cpu.Registradores[(instr >> 15) & 0b11111]:X8}) << shamt({(int)((instr >> 20) & 0b11111)})");
+
 
             // x[rd] = x[rs1] << shamt
             cpu.Registradores[(instr >> 7) & 0b11111] =
                 (uint)(cpu.Registradores[(instr >> 15) & 0b11111] <<
                 (int)((instr >> 20) & 0b11111));
-
-            Console.WriteLine($"Operação: rs1(0x{cpu.Registradores[(instr >> 15) & 0b11111]:X8}) << shamt({(int)((instr >> 20) & 0b11111)})");
             Console.WriteLine($"rd depois da operação: 0x{cpu.Registradores[(instr >> 7) & 0b11111]:X8}\n\n");
 
             cpu.iterar_pc();
@@ -34,22 +35,24 @@ namespace Simulador_de_Computador_RISC_V.CPU
 
         public static void SRLI(CPU cpu, uint instr)
         {
+
+            Console.WriteLine("Operação SRLI\n");
             if (((instr >> 7) & 0b11111) == 0b0)
             {
                 Console.WriteLine("Registrador[0] é imutável.");
                 cpu.iterar_pc();
                 return;
             }
-
-            Console.WriteLine("Operação SRLI\n");
             Console.WriteLine($"rd antes da operação: 0x{cpu.Registradores[((instr >> 7) & 0b11111)]:X8}");
+
+            Console.WriteLine($"Operação: rs1(0x{cpu.Registradores[(instr >> 15) & 0b11111]:X8}) >> shamt({(int)((instr >> 20) & 0b11111)})");
+
 
             // x[rd] = x[rs1] >> shamt
             cpu.Registradores[(instr >> 7) & 0b11111] =
                 (uint)(cpu.Registradores[(instr >> 15) & 0b11111] >>
                 (int)((instr >> 20) & 0b11111));
 
-            Console.WriteLine($"Operação: rs1(0x{cpu.Registradores[(instr >> 15) & 0b11111]:X8}) >> shamt({(int)((instr >> 20) & 0b11111)})");
             Console.WriteLine($"rd depois da operação: 0x{cpu.Registradores[(instr >> 7) & 0b11111]:X8}\n\n");
 
             cpu.iterar_pc();
@@ -58,6 +61,8 @@ namespace Simulador_de_Computador_RISC_V.CPU
 
         public static void SRAI(CPU cpu, uint instr)
         {
+            Console.WriteLine("Operação SRAI\n");
+
             if (((instr >> 7) & 0b11111) == 0b0)
             {
                 Console.WriteLine("Registrador[0] é imutável.");
@@ -65,15 +70,16 @@ namespace Simulador_de_Computador_RISC_V.CPU
                 return;
             }
 
-            Console.WriteLine("Operação SRAI\n");
             Console.WriteLine($"rd antes da operação: 0x{cpu.Registradores[((instr >> 7) & 0b11111)]:X8}");
+
+            Console.WriteLine($"Operação: rs1(0x{cpu.Registradores[(instr >> 15) & 0b11111]:X8}) >> shamt({(int)((instr >> 20) & 0b11111)})");
+
 
             // x[rd] = x[rs1] >> shamt (aritmético)
             cpu.Registradores[(instr >> 7) & 0b11111] =
                 (uint)((int)cpu.Registradores[(instr >> 15) & 0b11111] >>
                 (int)((instr >> 20) & 0b11111));
 
-            Console.WriteLine($"Operação: rs1(0x{cpu.Registradores[(instr >> 15) & 0b11111]:X8}) >> shamt({(int)((instr >> 20) & 0b11111)})");
             Console.WriteLine($"rd depois da operação: 0x{cpu.Registradores[(instr >> 7) & 0b11111]:X8}\n\n");
 
             cpu.iterar_pc();
@@ -82,21 +88,23 @@ namespace Simulador_de_Computador_RISC_V.CPU
 
         public static void XORI(CPU cpu, uint instr)
         {
+            Console.WriteLine("Operação XORI\n");
+
             if (((instr >> 7) & 0b11111) == 0b0)
             {
                 Console.WriteLine("Registrador[0] é imutável.");
                 cpu.iterar_pc();
                 return;
             }
-
-            Console.WriteLine("Operação XORI\n");
             Console.WriteLine($"rd antes da operação: 0x{cpu.Registradores[((instr >> 7) & 0b11111)]:X8}");
+
+            Console.WriteLine($"Operação: rs1(0x{cpu.Registradores[(instr >> 15) & 0b11111]:X8}) ^ imm({((int)instr) >> 20})");
+
 
             // x[rd] = x[rs1] ^ imm
             cpu.Registradores[(instr >> 7) & 0b11111] =
                 (uint)(cpu.Registradores[(instr >> 15) & 0b11111] ^
                 (((int)instr) >> 20));
-            Console.WriteLine($"Operação: rs1(0x{cpu.Registradores[(instr >> 15) & 0b11111]:X8}) ^ imm({((int)instr) >> 20})");
             Console.WriteLine($"rd depois da operação: 0x{cpu.Registradores[(instr >> 7) & 0b11111]:X8}\n\n");
 
             cpu.iterar_pc();
@@ -105,6 +113,8 @@ namespace Simulador_de_Computador_RISC_V.CPU
 
         public static void ORI(CPU cpu, uint instr)
         {
+            Console.WriteLine("Operação ORI\n");
+
             if (((instr >> 7) & 0b11111) == 0b0)
             {
                 Console.WriteLine("Registrador[0] é imutável.");
@@ -112,15 +122,15 @@ namespace Simulador_de_Computador_RISC_V.CPU
                 return;
             }
 
-            Console.WriteLine("Operação ORI\n");
             Console.WriteLine($"rd antes da operação: 0x{cpu.Registradores[((instr >> 7) & 0b11111)]:X8}");
+
+            Console.WriteLine($"Operação: rs1(0x{cpu.Registradores[(instr >> 15) & 0b11111]:X8}) | imm({((int)instr) >> 20})");
 
             // x[rd] = x[rs1] | imm
             cpu.Registradores[(instr >> 7) & 0b11111] =
                 (uint)(cpu.Registradores[(instr >> 15) & 0b11111] |
                 (((int)instr) >> 20));
 
-            Console.WriteLine($"Operação: rs1(0x{cpu.Registradores[(instr >> 15) & 0b11111]:X8}) | imm({((int)instr) >> 20})");
             Console.WriteLine($"rd depois da operação: 0x{cpu.Registradores[(instr >> 7) & 0b11111]:X8}\n\n");
 
             cpu.iterar_pc();
@@ -129,6 +139,8 @@ namespace Simulador_de_Computador_RISC_V.CPU
 
         public static void ANDI(CPU cpu, uint instr)
         {
+            Console.WriteLine("Operação ANDI\n");
+
             if (((instr >> 7) & 0b11111) == 0b0)
             {
                 Console.WriteLine("Registrador[0] é imutável.");
@@ -136,15 +148,15 @@ namespace Simulador_de_Computador_RISC_V.CPU
                 return;
             }
 
-            Console.WriteLine("Operação ANDI\n");
             Console.WriteLine($"rd antes da operação: 0x{cpu.Registradores[((instr >> 7) & 0b11111)]:X8}");
+
+            Console.WriteLine($"Operação: rs1(0x{cpu.Registradores[(instr >> 15) & 0b11111]:X8}) & imm({((int)instr) >> 20})");
 
             // x[rd] = x[rs1] & imm
             cpu.Registradores[(instr >> 7) & 0b11111] =
                 (uint)(cpu.Registradores[(instr >> 15) & 0b11111] &
                 (((int)instr) >> 20));
 
-            Console.WriteLine($"Operação: rs1(0x{cpu.Registradores[(instr >> 15) & 0b11111]:X8}) & imm({((int)instr) >> 20})");
             Console.WriteLine($"rd depois da operação: 0x{cpu.Registradores[(instr >> 7) & 0b11111]:X8}\n\n");
 
             cpu.iterar_pc();
@@ -152,6 +164,8 @@ namespace Simulador_de_Computador_RISC_V.CPU
 
         public static void SLTI(CPU cpu, uint instr)
         {
+            Console.WriteLine("Operação SLTI\n");
+
             if (((instr >> 7) & 0b11111) == 0b0)
             {
                 Console.WriteLine("Registrador[0] é imutável.");
@@ -159,15 +173,15 @@ namespace Simulador_de_Computador_RISC_V.CPU
                 return;
             }
 
-            Console.WriteLine("Operação SLTI\n");
             Console.WriteLine($"rd antes da operação: 0x{cpu.Registradores[((instr >> 7) & 0b11111)]:X8}");
+
+            Console.WriteLine($"Operação: rs1(0x{(int)cpu.Registradores[(instr >> 15) & 0b11111]}) < imm({((int)instr) >> 20})");
 
             // x[rd] = (x[rs1] < imm) ? 1 : 0
             cpu.Registradores[(instr >> 7) & 0b11111] =
                 (uint)(((int)cpu.Registradores[(instr >> 15) & 0b11111] <
                 (((int)instr) >> 20)) ? 1 : 0);
 
-            Console.WriteLine($"Operação: rs1(0x{(int)cpu.Registradores[(instr >> 15) & 0b11111]}) < imm({((int)instr) >> 20})");
             Console.WriteLine($"rd depois da operação: 0x{cpu.Registradores[(instr >> 7) & 0b11111]:X8}\n\n");
 
             cpu.iterar_pc();
@@ -176,22 +190,23 @@ namespace Simulador_de_Computador_RISC_V.CPU
 
         public static void SLTIU(CPU cpu, uint instr)
         {
+
+            Console.WriteLine("Operação SLTIU\n");
             if (((instr >> 7) & 0b11111) == 0b0)
             {
                 Console.WriteLine("Registrador[0] é imutável.");
                 cpu.iterar_pc();
                 return;
             }
-
-            Console.WriteLine("Operação SLTIU\n");
             Console.WriteLine($"rd antes da operação: 0x{cpu.Registradores[((instr >> 7) & 0b11111)]:X8}");
+
+            Console.WriteLine($"Operação: rs1(0x{cpu.Registradores[(instr >> 15) & 0b11111]:X8}) < imm({(uint)(((int)instr) >> 20)})");
 
             // x[rd] = (x[rs1] < imm) ? 1 : 0 (unsigned)
             cpu.Registradores[(instr >> 7) & 0b11111] =
                 (uint)((cpu.Registradores[(instr >> 15) & 0b11111] <
                 (uint)(((int)instr) >> 20)) ? 1 : 0);
 
-            Console.WriteLine($"Operação: rs1(0x{cpu.Registradores[(instr >> 15) & 0b11111]:X8}) < imm({(uint)(((int)instr) >> 20)})");
             Console.WriteLine($"rd depois da operação: 0x{cpu.Registradores[(instr >> 7) & 0b11111]:X8}\n\n");
 
             cpu.iterar_pc();
@@ -199,6 +214,7 @@ namespace Simulador_de_Computador_RISC_V.CPU
 
         public static void ADDI(CPU cpu, uint instr)
         {
+            Console.WriteLine("Operação ADDI");
             if (((instr >> 7) & 0b11111) == 0b0)
             {
                 Console.WriteLine("Registrador[0] é imutável.");
@@ -206,14 +222,14 @@ namespace Simulador_de_Computador_RISC_V.CPU
                 return;
             }
 
-            Console.WriteLine("Operação ADDI");
             Console.WriteLine($"rd antes da operação: 0x{cpu.Registradores[((instr >> 7) & 0b11111)]:X8}");
+
+            Console.WriteLine($"Operação: rs1(0x{(int)cpu.Registradores[(instr >> 15) & 0b11111]:X8}) + imm({((int)instr) >> 20})");
 
             // x[rd] = x[rs1] + imm
             cpu.Registradores[(instr >> 7) & 0b11111] =
                 (uint)((int)cpu.Registradores[(instr >> 15) & 0b11111] + (((int)instr) >> 20));
 
-            Console.WriteLine($"Operação: rs1(0x{(int)cpu.Registradores[(instr >> 15) & 0b11111]:X8}) + imm({((int)instr) >> 20})");
             Console.WriteLine($"rd depois da operação: 0x{cpu.Registradores[(instr >> 7) & 0b11111]:X8}\n\n");
 
             cpu.iterar_pc();
@@ -222,20 +238,23 @@ namespace Simulador_de_Computador_RISC_V.CPU
 
         public static void AUIPC(CPU cpu, uint instr)
         {
+            Console.WriteLine("Operação AUIPC\n");
+
             if (((instr >> 7) & 0b11111) == 0b0)
             {
                 Console.WriteLine("Registrador[0] é imutável.");
                 cpu.iterar_pc();
                 return;
             }
-            Console.WriteLine("Operação AUIPC\n");
             Console.WriteLine($"rd antes da operação: 0x{cpu.Registradores[((instr >> 7) & 0b11111)]:X8}");
 
             // x[rd] = PC + (imm << 12)
             uint offset = instr & 0xFFFFF000;
-            cpu.Registradores[(instr >> 7) & 0b11111] = cpu.PC + offset;
 
             Console.WriteLine($"Operação: PC(0x{cpu.PC:X8}) + imm<<12(0x{offset:X8})");
+
+            cpu.Registradores[(instr >> 7) & 0b11111] = cpu.PC + offset;
+
             Console.WriteLine($"rd depois da operação: 0x{cpu.Registradores[(instr >> 7) & 0b11111]:X8}\n\n");
 
             cpu.iterar_pc();
@@ -243,20 +262,22 @@ namespace Simulador_de_Computador_RISC_V.CPU
 
         public static void SLL(CPU cpu, uint instr)
         {
+            Console.WriteLine("Operação SLL\n");
+
             if (((instr >> 7) & 0b11111) == 0b0)
             {
                 Console.WriteLine("Registrador[0] é imutável.");
                 cpu.iterar_pc();
                 return;
             }
-            Console.WriteLine("Operação SLL\n");
             Console.WriteLine($"rd antes da operação: 0x{cpu.Registradores[((instr >> 7) & 0b11111)]:X8}");
+
+            Console.WriteLine($"Operação: rs1(0x{cpu.Registradores[(instr >> 15) & 0b11111]:X8}) << (rs2(0x{cpu.Registradores[(instr >> 20) & 0b11111]:X8}) & 0b11111)");
 
             // x[rd] = x[rs1] << (x[rs2] & 0b11111)
             cpu.Registradores[(instr >> 7) & 0b11111] =
                 (uint)(cpu.Registradores[(instr >> 15) & 0b11111] << (int)(cpu.Registradores[(instr >> 20) & 0b11111] & 0b11111));
 
-            Console.WriteLine($"Operação: rs1(0x{cpu.Registradores[(instr >> 15) & 0b11111]:X8}) << (rs2(0x{cpu.Registradores[(instr >> 20) & 0b11111]:X8}) & 0b11111)");
             Console.WriteLine($"rd depois da operação: 0x{cpu.Registradores[(instr >> 7) & 0b11111]:X8}\n\n");
 
             cpu.iterar_pc();
@@ -265,20 +286,22 @@ namespace Simulador_de_Computador_RISC_V.CPU
 
         public static void SRL(CPU cpu, uint instr)
         {
+            Console.WriteLine("Operação SRL\n");
+
             if (((instr >> 7) & 0b11111) == 0b0)
             {
                 Console.WriteLine("Registrador[0] é imutável.");
                 cpu.iterar_pc();
                 return;
             }
-            Console.WriteLine("Operação SRL\n");
             Console.WriteLine($"rd antes da operação: 0x{cpu.Registradores[((instr >> 7) & 0b11111)]:X8}");
+
+            Console.WriteLine($"Operação: rs1(0x{cpu.Registradores[(instr >> 15) & 0b11111]:X8}) >> (rs2(0x{cpu.Registradores[(instr >> 20) & 0b11111]:X8}) & 0b11111)");
 
             // x[rd] = x[rs1] >> (x[rs2] & 0b11111)
             cpu.Registradores[(instr >> 7) & 0b11111] =
                 (uint)(cpu.Registradores[(instr >> 15) & 0b11111] >> (int)(cpu.Registradores[(instr >> 20) & 0b11111] & 0b11111));
 
-            Console.WriteLine($"Operação: rs1(0x{cpu.Registradores[(instr >> 15) & 0b11111]:X8}) >> (rs2(0x{cpu.Registradores[(instr >> 20) & 0b11111]:X8}) & 0b11111)");
             Console.WriteLine($"rd depois da operação: 0x{cpu.Registradores[(instr >> 7) & 0b11111]:X8}\n\n");
 
             cpu.iterar_pc();
@@ -287,20 +310,21 @@ namespace Simulador_de_Computador_RISC_V.CPU
 
         public static void SRA(CPU cpu, uint instr)
         {
+            Console.WriteLine("Operação SRA\n");
             if (((instr >> 7) & 0b11111) == 0b0)
             {
                 Console.WriteLine("Registrador[0] é imutável.");
                 cpu.iterar_pc();
                 return;
             }
-            Console.WriteLine("Operação SRA\n");
             Console.WriteLine($"rd antes da operação: 0x{cpu.Registradores[((instr >> 7) & 0b11111)]:X8}");
+
+            Console.WriteLine($"Operação: rs1(0x{cpu.Registradores[(instr >> 15) & 0b11111]:X8}) >> (rs2(0x{cpu.Registradores[(instr >> 20) & 0b11111]:X8}) & 0b11111)");
 
             // x[rd] = x[rs1] >> (x[rs2] & 0b11111) (aritmético)
             cpu.Registradores[(instr >> 7) & 0b11111] =
                 (uint)((int)cpu.Registradores[(instr >> 15) & 0b11111] >> (int)(cpu.Registradores[(instr >> 20) & 0b11111] & 0b11111));
 
-            Console.WriteLine($"Operação: rs1(0x{cpu.Registradores[(instr >> 15) & 0b11111]:X8}) >> (rs2(0x{cpu.Registradores[(instr >> 20) & 0b11111]:X8}) & 0b11111)");
             Console.WriteLine($"rd depois da operação: 0x{cpu.Registradores[(instr >> 7) & 0b11111]:X8}\n\n");
 
             cpu.iterar_pc();
@@ -309,22 +333,23 @@ namespace Simulador_de_Computador_RISC_V.CPU
 
         public static void ADD(CPU cpu, uint instr)
         {
+            Console.WriteLine("Operação ADD\n");
+
             if (((instr >> 7) & 0b11111) == 0b0)
             {
                 Console.WriteLine("Registrador[0] é imutável.");
                 cpu.iterar_pc();
                 return;
             }
-
-            Console.WriteLine("Operação ADD\n");
             Console.WriteLine($"rd antes da operação: 0x{cpu.Registradores[((instr >> 7) & 0b11111)]:X8}");
+
+            Console.WriteLine($"Operação: rs1(0x{cpu.Registradores[(instr >> 15) & 0b11111]:X8}) + rs2(0x{cpu.Registradores[(instr >> 20) & 0b11111]:X8})");
 
             // x[rd] = x[rs1] + x[rs2]
             cpu.Registradores[(instr >> 7) & 0b11111] =
                 (uint)(cpu.Registradores[(instr >> 15) & 0b11111] +
                 cpu.Registradores[(instr >> 20) & 0b11111]);
 
-            Console.WriteLine($"Operação: rs1(0x{cpu.Registradores[(instr >> 15) & 0b11111]:X8}) + rs2(0x{cpu.Registradores[(instr >> 20) & 0b11111]:X8})");
             Console.WriteLine($"rd depois da operação: 0x{cpu.Registradores[(instr >> 7) & 0b11111]:X8}\n\n");
 
             cpu.iterar_pc();
@@ -333,22 +358,23 @@ namespace Simulador_de_Computador_RISC_V.CPU
 
         public static void SUB(CPU cpu, uint instr)
         {
+
+            Console.WriteLine("Operação SUB\n");
             if (((instr >> 7) & 0b11111) == 0b0)
             {
                 Console.WriteLine("Registrador[0] é imutável.");
                 cpu.iterar_pc();
                 return;
             }
-
-            Console.WriteLine("Operação SUB\n");
             Console.WriteLine($"rd antes da operação: 0x{cpu.Registradores[((instr >> 7) & 0b11111)]:X8}");
+
+            Console.WriteLine($"Operação: rs1(0x{(int)cpu.Registradores[(instr >> 15) & 0b11111]:X8}) - rs2(0x{(int)cpu.Registradores[(instr >> 20) & 0b11111]:X8})");
 
             // x[rd] = x[rs1] - x[rs2]
             cpu.Registradores[(instr >> 7) & 0b11111] =
                 (uint)((int)cpu.Registradores[(instr >> 15) & 0b11111] -
                 (int)cpu.Registradores[(instr >> 20) & 0b11111]);
 
-            Console.WriteLine($"Operação: rs1(0x{(int)cpu.Registradores[(instr >> 15) & 0b11111]:X8}) - rs2(0x{(int)cpu.Registradores[(instr >> 20) & 0b11111]:X8})");
             Console.WriteLine($"rd depois da operação: 0x{cpu.Registradores[(instr >> 7) & 0b11111]:X8}\n\n");
 
             cpu.iterar_pc();
@@ -357,20 +383,23 @@ namespace Simulador_de_Computador_RISC_V.CPU
 
         public static void XOR(CPU cpu, uint instr)
         {
+
+            Console.WriteLine("Operação XOR\n");
             if (((instr >> 7) & 0b11111) == 0b0)
             {
                 Console.WriteLine("Registrador[0] é imutável.");
                 cpu.iterar_pc();
                 return;
             }
-            Console.WriteLine("Operação XOR\n");
             Console.WriteLine($"rd antes da operação: 0x{cpu.Registradores[((instr >> 7) & 0b11111)]:X8}");
+
+            Console.WriteLine($"Operação: rs1(0x{cpu.Registradores[(instr >> 15) & 0b11111]:X8}) ^ rs2(0x{cpu.Registradores[(instr >> 20) & 0b11111]:X8})");
+
             // x[rd] = x[rs1] ^ x[rs2]
             cpu.Registradores[(instr >> 7) & 0b11111] =
                 (uint)(cpu.Registradores[(instr >> 15) & 0b11111] ^
                 cpu.Registradores[(instr >> 20) & 0b11111]);
 
-            Console.WriteLine($"Operação: rs1(0x{cpu.Registradores[(instr >> 15) & 0b11111]:X8}) ^ rs2(0x{cpu.Registradores[(instr >> 20) & 0b11111]:X8})");
             Console.WriteLine($"rd depois da operação: 0x{cpu.Registradores[(instr >> 7) & 0b11111]:X8}\n\n");
 
             cpu.iterar_pc();
@@ -379,22 +408,22 @@ namespace Simulador_de_Computador_RISC_V.CPU
 
         public static void OR(CPU cpu, uint instr)
         {
+
+            Console.WriteLine("Operação OR\n");
             if (((instr >> 7) & 0b11111) == 0b0)
             {
                 Console.WriteLine("Registrador[0] é imutável.");
                 cpu.iterar_pc();
                 return;
             }
-
-            Console.WriteLine("Operação OR\n");
             Console.WriteLine($"rd antes da operação: 0x{cpu.Registradores[((instr >> 7) & 0b11111)]:X8}");
+
+            Console.WriteLine($"Operação: rs1(0x{cpu.Registradores[(instr >> 15) & 0b11111]:X8}) | rs2(0x{cpu.Registradores[(instr >> 20) & 0b11111]:X8})");
 
             // x[rd] = x[rs1] | x[rs2]
             cpu.Registradores[(instr >> 7) & 0b11111] =
                 (uint)(cpu.Registradores[(instr >> 15) & 0b11111] |
                 cpu.Registradores[(instr >> 20) & 0b11111]);
-
-            Console.WriteLine($"Operação: rs1(0x{cpu.Registradores[(instr >> 15) & 0b11111]:X8}) | rs2(0x{cpu.Registradores[(instr >> 20) & 0b11111]:X8})");
             Console.WriteLine($"rd depois da operação: 0x{cpu.Registradores[(instr >> 7) & 0b11111]:X8}\n\n");
 
             cpu.iterar_pc();
@@ -403,22 +432,23 @@ namespace Simulador_de_Computador_RISC_V.CPU
 
         public static void AND(CPU cpu, uint instr)
         {
+
+            Console.WriteLine("Operação AND\n");
             if (((instr >> 7) & 0b11111) == 0b0)
             {
                 Console.WriteLine("Registrador[0] é imutável.");
                 cpu.iterar_pc();
                 return;
             }
-
-            Console.WriteLine("Operação AND\n");
             Console.WriteLine($"rd antes da operação: 0x{cpu.Registradores[((instr >> 7) & 0b11111)]:X8}");
+
+            Console.WriteLine($"Operação: rs1(0x{cpu.Registradores[(instr >> 15) & 0b11111]:X8}) & rs2(0x{cpu.Registradores[(instr >> 20) & 0b11111]:X8})");
 
             // x[rd] = x[rs1] & x[rs2]
             cpu.Registradores[(instr >> 7) & 0b11111] =
                 (uint)(cpu.Registradores[(instr >> 15) & 0b11111] &
                 cpu.Registradores[(instr >> 20) & 0b11111]);
 
-            Console.WriteLine($"Operação: rs1(0x{cpu.Registradores[(instr >> 15) & 0b11111]:X8}) & rs2(0x{cpu.Registradores[(instr >> 20) & 0b11111]:X8})");
             Console.WriteLine($"rd depois da operação: 0x{cpu.Registradores[(instr >> 7) & 0b11111]:X8}\n\n");
 
             cpu.iterar_pc();
@@ -427,21 +457,22 @@ namespace Simulador_de_Computador_RISC_V.CPU
 
         public static void SLT(CPU cpu, uint instr)
         {
+
+            Console.WriteLine("Operação SLT\n");
             if (((instr >> 7) & 0b11111) == 0b0)
             {
                 Console.WriteLine("Registrador[0] é imutável.");
                 cpu.iterar_pc();
                 return;
             }
-
-            Console.WriteLine("Operação SLT\n");
             Console.WriteLine($"rd antes da operação: 0x{cpu.Registradores[((instr >> 7) & 0b11111)]:X8}");
+
+            Console.WriteLine($"Operação: rs1(0x{(int)cpu.Registradores[(instr >> 15) & 0b11111]}) < rs2(0x{(int)cpu.Registradores[(instr >> 20) & 0b11111]})");
 
             // x[rd] = (x[rs1] < x[rs2]) signed
             cpu.Registradores[(instr >> 7) & 0b11111] =
                 (uint)(((int)cpu.Registradores[(instr >> 15) & 0b11111] < (int)cpu.Registradores[(instr >> 20) & 0b11111]) ? 1 : 0);
 
-            Console.WriteLine($"Operação: rs1(0x{(int)cpu.Registradores[(instr >> 15) & 0b11111]}) < rs2(0x{(int)cpu.Registradores[(instr >> 20) & 0b11111]})");
             Console.WriteLine($"rd depois da operação: 0x{cpu.Registradores[(instr >> 7) & 0b11111]:X8}\n\n");
 
             cpu.iterar_pc();
@@ -450,21 +481,22 @@ namespace Simulador_de_Computador_RISC_V.CPU
 
         public static void SLTU(CPU cpu, uint instr)
         {
+
+            Console.WriteLine("Operação SLTU\n");
             if (((instr >> 7) & 0b11111) == 0b0)
             {
                 Console.WriteLine("Registrador[0] é imutável.");
                 cpu.iterar_pc();
                 return;
             }
-
-            Console.WriteLine("Operação SLTU\n");
             Console.WriteLine($"rd antes da operação: 0x{cpu.Registradores[((instr >> 7) & 0b11111)]:X8}");
+
+            Console.WriteLine($"Operação: rs1(0x{cpu.Registradores[(instr >> 15) & 0b11111]:X8}) < rs2(0x{cpu.Registradores[(instr >> 20) & 0b11111]:X8})");
 
             // x[rd] = (x[rs1] < x[rs2]) unsigned
             cpu.Registradores[(instr >> 7) & 0b11111] =
                 (uint)((cpu.Registradores[(instr >> 15) & 0b11111] < cpu.Registradores[(instr >> 20) & 0b11111]) ? 1 : 0);
 
-            Console.WriteLine($"Operação: rs1(0x{cpu.Registradores[(instr >> 15) & 0b11111]:X8}) < rs2(0x{cpu.Registradores[(instr >> 20) & 0b11111]:X8})");
             Console.WriteLine($"rd depois da operação: 0x{cpu.Registradores[(instr >> 7) & 0b11111]:X8}\n\n");
 
             cpu.iterar_pc();
@@ -473,21 +505,23 @@ namespace Simulador_de_Computador_RISC_V.CPU
 
         public static void LUI(CPU cpu, uint instr)
         {
+
+            Console.WriteLine("Operação LUI\n");
             if (((instr >> 7) & 0b11111) == 0b0)
             {
                 Console.WriteLine("Registrador[0] é imutável.");
                 cpu.iterar_pc();
                 return;
             }
-
-            Console.WriteLine("Operação LUI\n");
             Console.WriteLine($"rd antes da operação: 0x{cpu.Registradores[((instr >> 7) & 0b11111)]:X8}");
 
+
+                
             // x[rd] = imm << 12
             uint imm = instr & 0xFFFFF000;
+            Console.WriteLine("Operação: imm<<12(0x{0:X8})", imm);
             cpu.Registradores[(instr >> 7) & 0b11111] = imm;
 
-            Console.WriteLine($"Operação: imm<<12(0x{imm:X8})");
             Console.WriteLine($"rd depois da operação: 0x{cpu.Registradores[(instr >> 7) & 0b11111]:X8}\n\n");
 
             cpu.iterar_pc();
@@ -542,6 +576,7 @@ namespace Simulador_de_Computador_RISC_V.CPU
 
                 uint offset_13bit = (imm12 << 12) | (imm11 << 11) | (imm10_5 << 5) | (imm4_1 << 1);
                 int final_offset = ((int)(offset_13bit << 19)) >> 19;
+
 
                 cpu.PC = (uint)((int)cpu.PC + final_offset);
                 Console.WriteLine($"BNE: Branch tomado! Offset: {final_offset}. Novo PC: {cpu.PC:X8}");
@@ -755,6 +790,61 @@ namespace Simulador_de_Computador_RISC_V.CPU
             Console.WriteLine($"Calculado: Memória[0x{endereco_final:X8}] = 0x{word_para_salvar:X8}");
 
             cpu.iterar_pc();
+        }
+
+        public static void LBU(CPU cpu, uint instr)
+        {
+            Console.WriteLine("Operação LBU");
+
+            uint rd_index = (instr >> 7) & 0x1F;
+            uint rs1_index = (instr >> 15) & 0x1F;
+            int offset = ((int)instr) >> 20;
+
+            uint endereco_base = cpu.Registradores[rs1_index];
+            uint endereco_final_byte = (uint)((int)endereco_base + offset);
+
+            uint endereco_palavra_alinhado = endereco_final_byte & 0xFFFFFFFC;
+
+            uint palavra_lida = cpu.Barramento.LerDadoMemoria(endereco_palavra_alinhado);
+
+            uint byte_offset = endereco_final_byte % 4;
+
+            byte dado_lido = (byte)((palavra_lida >> (int)(byte_offset * 8)) & 0xFF);
+
+            if (rd_index != 0)
+            {
+                cpu.Registradores[rd_index] = dado_lido;
+            }
+
+            Console.WriteLine($"Operação: x{rd_index} = Mem[rs1(0x{endereco_base:X8}) + offset({offset})]");
+            Console.WriteLine($"Calculado: x{rd_index} = Mem[0x{endereco_final_byte:X8}] -> Lido: 0x{dado_lido:X2}");
+            Console.WriteLine($"rd depois da operação: 0x{cpu.Registradores[rd_index]:X8}\n\n");
+
+            cpu.iterar_pc();
+        }
+        public static void JAL(CPU cpu, uint instr)
+        {
+            Console.WriteLine("Operação JAL");
+
+            uint rd_index = (instr >> 7) & 0x1F;
+
+            uint imm20 = (instr >> 31) & 0x1;
+            uint imm10_1 = (instr >> 21) & 0x3FF;
+            uint imm11 = (instr >> 20) & 0x1;
+            uint imm19_12 = (instr >> 12) & 0xFF;
+
+            uint offset_21bit = (imm20 << 20) | (imm19_12 << 12) | (imm11 << 11) | (imm10_1 << 1);
+
+            int final_offset = ((int)(offset_21bit << 11)) >> 11;
+
+            if (rd_index != 0)
+            {
+                cpu.Registradores[rd_index] = cpu.PC + 4;
+            }
+
+            cpu.PC = (uint)((int)cpu.PC + final_offset);
+
+            Console.WriteLine($"JAL: Saltando para 0x{cpu.PC:X8}. Endereço de retorno salvo em x{rd_index}");
         }
     }
 }
